@@ -34,7 +34,7 @@ fun LoginScreen(onNavigateToSignUp: () -> Unit, onLoginSuccess: (UserEntity) -> 
 
     LaunchedEffect(loginState) {
         if (loginState) {
-            val user = viewModel.fetchUser(viewModel.email.value) // Assuming you have a method to get the current user
+            val user = viewModel.fetchUser(viewModel.email.value)
             onLoginSuccess(user)
         }
     }
