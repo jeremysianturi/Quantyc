@@ -61,7 +61,10 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.quantyc.data.local.entities.UserEntity
 import com.example.quantyc.domain.model.Photo
+import com.example.quantyc.ui.components.AdminUserList
+import com.example.quantyc.ui.components.DeleteUserDialog
 import com.example.quantyc.ui.components.PhotoItem
+import com.example.quantyc.ui.components.UpdateUserDialog
 import com.example.quantyc.ui.viewmodel.AuthViewModel
 import com.example.quantyc.ui.viewmodel.PhotoViewModel
 
@@ -225,7 +228,6 @@ fun MainScreen(user: UserEntity, onLogout: () -> Unit, context: Context) {
         LaunchedEffect(successUpdatedDataAsAdmin) {
             if (!successUpdatedDataAsAdmin) {
                 Toast.makeText(context, "Successfully updated the user!", Toast.LENGTH_SHORT).show()
-                // Reset the state to avoid multiple toasts
                 authViewModel.resetUpdateUserState()
             } else {
                 Toast.makeText(context, "Failed to update the user!", Toast.LENGTH_SHORT).show()
@@ -245,136 +247,6 @@ fun MainScreen(user: UserEntity, onLogout: () -> Unit, context: Context) {
                 }
             }
         )
-    }
-}
-
-@Composable
-fun UpdateUserDialog(
-    user: UserEntity?,
-    onDismiss: () -> Unit,
-    onUpdateConfirm: (UserEntity) -> Unit
-) {
-    if (user == null) return
-
-    var updatedUsername by remember { mutableStateOf(user.username) }
-    var updatedEmail by remember { mutableStateOf(user.email) }
-
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Update User") },
-        text = {
-            Column {
-                TextField(
-                    value = updatedUsername,
-                    onValueChange = { updatedUsername = it },
-                    label = { Text("Username") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = updatedEmail,
-                    onValueChange = { updatedEmail = it },
-                    label = { Text("Email") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                onUpdateConfirm(
-                    user.copy(
-                        username = updatedUsername,
-                        email = updatedEmail,
-                    )
-                )
-            }) {
-                Text("Update")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-
-
-@Composable
-fun DeleteUserDialog(
-    user: UserEntity?,
-    password: String,
-    onPasswordChange: (String) -> Unit,
-    onDeleteConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    if (user == null) return
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Delete User") },
-        text = {
-            Column {
-                Text("Are you sure you want to delete ${user.username}?")
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = password,
-                    onValueChange = onPasswordChange,
-                    label = { Text("Enter your password to confirm") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onDeleteConfirm) {
-                Text("Delete")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-
-@Composable
-fun AdminUserList(
-    users: List<UserEntity>,
-    onUpdateUser: (UserEntity) -> Unit,
-    onDeleteUser: (UserEntity) -> Unit
-) {
-    LazyColumn {
-        items(
-            count = users.size,
-        ) { index ->
-            val user = users[index]
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = user.id.toString(), modifier = Modifier.weight(1f))
-                Text(text = user.username, modifier = Modifier.weight(2f))
-                Text(text = user.email, modifier = Modifier.weight(3f))
-                Text(text = user.role, modifier = Modifier.weight(2f))
-
-                IconButton(onClick = { onUpdateUser(user) }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Update User")
-                }
-                IconButton(onClick = { onDeleteUser(user) }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete User")
-                }
-            }
-        }
     }
 }
 
